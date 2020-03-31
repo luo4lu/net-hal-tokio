@@ -1,0 +1,12 @@
+[package]
+name = "net-hal-tokio"
+version = "0.1.0"
+authors = ["tiannian <dtiannian@aliyun.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+net-hal = { git = "https://github.com/Yinet-project/net-hal" }
+addr-hal = "0.1"
+
