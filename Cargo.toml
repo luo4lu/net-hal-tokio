@@ -9,4 +9,4 @@ edition = "2018"
 [dependencies]
 net-hal = { git = "https://github.com/Yinet-project/net-hal" }
 addr-hal = "0.1"
-
+async-trait = "0.1"
