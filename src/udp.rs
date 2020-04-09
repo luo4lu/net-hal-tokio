@@ -1,43 +1,64 @@
-use addr_hal::{ToSocketAddrs, SocketAddressV4, SocketAddressV6};
-use net_hal::UdpHandler;
-use net_hal::UdpServer;
+use addr_hal::ToSocketAddrs;
 use async_trait::async_trait;
+use net_hal::udp::{UdpSocket, UdpServer};
+use addr_hal::SocketAddr;
 
-use std::net::UdpSocket;
-use std::error::Error;
+//use tokio::net::UdpSocket;
 
-#[derive(Clone, Copy, PartialOrd, PartialEq, Eq, Ord,Debug)]
-pub struct UdpHandlerinner{
-    inner:UdpSocket,
+use crate::addr;
+
+//#[derive(PartialOrd, PartialEq, Debug)]
+pub struct TokioUdpSocket {
+    inner: tokio::net::UdpSocket,
 }
 
 #[async_trait]
-impl UdpHandler for UdpHandlerinner{
-    type SA4 = dyn SocketAddressV4;
-    type SA6 = dyn SocketAddressV6;
-    type Error = dyn Error;
+impl UdpSocket for TokioUdpSocket {
+    type SA4 = addr::SocketV4Inner;
+    type SA6 = addr::SocketV6Inner;
+    type Error = tokio::io::Error;
+    async fn connect(&self, addr: SocketAddr<Self::SA4, Self::SA6>) -> Result<(), Self::Error>
+    {
+    //    let mut a = match addr.to_socket_addrs(){
+    //        Ok(s) => s,
+    //        Err(error) => panic!("to socket addrs return addr error:{:?}",error),
+    //    };
 
-    async fn connect<A>(addr: A) where A: ToSocketAddrs<Self::SA4, Self::SA6>{
-        Self{
-            inner: UdpSocket::connect(addr).await
-        };
+       match addr {
+            SocketAddr::V4(v) => self.inner.connect(v.inner.inner).await,
+            SocketAddr::V6(v) => self.inner.connect(v.inner.inner).await,
+        }
+        
+    } 
+
+    async fn send(&mut self, buffer: &[u8]) -> Result<usize, Self::Error>
+    {
+        self.inner.send(buffer).await
+    }
+
+    async fn recv(&mut self, buffer: &mut [u8]) -> Result<usize, Self::Error>
+    {
+        self.inner.recv(buffer).await
     }
 }
 
-#[derive(Clone, Copy, PartialOrd, PartialEq, Eq, Ord,Debug)]
-pub struct UdpServerinner{
-    inner:UdpServer,
-}
+//#[derive(PartialOrd, PartialEq,Debug)]
+pub struct UdpServerinner {}
 
 #[async_trait]
-impl UdpServer for UdpServerinner{
-    type SA4 = dyn SocketAddressV4;
-    type SA6 = dyn SocketAddressV6;
-    type Error = dyn Error;
+impl UdpServer for UdpServerinner {
+    type SA4 = addr::SocketV4Inner;
+    type SA6 = addr::SocketV6Inner;
+    type Error = tokio::io::Error;
+    type BindResult = TokioUdpSocket;
 
-    async fn bind<A>(addr: A) where A: ToSocketAddrs<Self::SA4, Self::SA6>{
-        Self{
-            inner: UdpSocket::bind(addr).await
+    async fn bind(addr: SocketAddr<Self::SA4, Self::SA6>) -> Result<Self::BindResult, Self::Error>
+    {
+        let r = match addr{
+            SocketAddr::V4(v) =>tokio::net::UdpSocket::bind(v.inner.inner).await,
+            SocketAddr::V6(v) =>tokio::net::UdpSocket::bind(v.inner.inner).await,
         };
+        let s = TokioUdpSocket {inner: r.unwrap()};
+        Ok(s)
     }
 }
