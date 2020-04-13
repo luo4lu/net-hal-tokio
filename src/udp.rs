@@ -69,7 +69,7 @@ mod tests {
         };
 
         let mut buf = [0;10];
-        let buf_size = match server.recv(&mut buf).await {
+        let _buf_size = match server.recv(&mut buf).await {
             Ok(received) => println!("received {} bytes {:?}", received, &buf[..received]),
             Err(e) => panic!("recv function failed: {:?}", e),
         };
@@ -87,7 +87,7 @@ mod tests {
             Err(error) => panic!("couldn't connect to address{:?}", error),
         };
 
-        let buf_size = match sock.send(&[0, 1, 2]).await {
+        let _buf_size = match sock.send(&[0, 1, 2]).await {
             Ok(s) => println!("send buffer size = {}",s),
             Err(error) => panic!("couldn't send to address{:?}", error),
         };
