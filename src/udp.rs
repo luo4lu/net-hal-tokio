@@ -59,19 +59,7 @@ mod tests {
     use super::*;
 
     #[tokio::test]
-    async fn test_server() {
-        let mut server = match TokioUdpSocket::bind(SocketAddr::from(([127, 0, 0, 1], 3401))).await
-        {
-            Ok(s) => s,
-            Err(error) => panic!("couldn't bind to address{:?}", error),
-        };
-
-        let mut buf = [0; 10];
-        let _buf_size = match server.recv(&mut buf).await {
-            Ok(received) => println!("received {} bytes {:?}", received, &buf[..received]),
-            Err(e) => panic!("recv function failed: {:?}", e),
-        };
-    }
+    async fn test_server() {}
 
     #[tokio::test]
     async fn test_sock() {
@@ -80,14 +68,23 @@ mod tests {
             Err(error) => panic!("couldn't bind to address{:?}", error),
         };
 
-        match sock.connect(SocketAddr::from(([127, 0, 0, 1], 3401))).await {
+        match sock.connect(SocketAddr::from(([127, 0, 0, 1], 3400))).await {
             Ok(s) => s,
             Err(error) => panic!("couldn't connect to address{:?}", error),
         };
 
-        let _buf_size = match sock.send(&[0, 1, 2]).await {
+        match sock.send(&[0, 1, 2]).await {
             Ok(s) => println!("send buffer size = {}", s),
             Err(error) => panic!("couldn't send to address{:?}", error),
         };
+        let mut buf = [0; 10];
+        let _buf_size = match sock.recv(&mut buf).await {
+            Ok(received) => {
+                println!("received {} bytes {:?}", received, &buf[..received]);
+                received
+            }
+            Err(e) => panic!("recv function failed: {:?}", e),
+        };
+        assert_eq!([0, 1, 2], &buf[.._buf_size]);
     }
 }
