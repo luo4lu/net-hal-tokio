@@ -16,9 +16,9 @@ async fn echo_request<S: UdpSocket>(socket: &mut S) {
 
 #[tokio::main]
 async fn main() {
-    use net_hal_tokio::udp::TokioUdpServer;
+    use net_hal_tokio::udp::TokioUdpSocket;
     
-    let mut handle = match TokioUdpServer::bind(SocketAddr::from(([127, 0, 0, 1], 3401))).await{
+    let mut handle = match TokioUdpSocket::bind(SocketAddr::from(([127, 0, 0, 1], 3401))).await{
         Ok(s) => s,
         Err(_error) => panic!("couldn't bind to address"),
     };

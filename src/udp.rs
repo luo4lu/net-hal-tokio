@@ -37,11 +37,9 @@ impl UdpSocket for TokioUdpSocket {
     }
 }
 
-#[derive(Debug)]
-pub struct TokioUdpServer {}
 
 #[async_trait]
-impl UdpServer for TokioUdpServer {
+impl UdpServer for TokioUdpSocket {
     type SA4 = addr::SocketV4Inner;
     type SA6 = addr::SocketV6Inner;
     type Error = tokio::io::Error;
@@ -63,7 +61,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_server() {
-        let mut server = match TokioUdpServer::bind(SocketAddr::from(([127, 0, 0, 1], 3401))).await {
+        let mut server = match TokioUdpSocket::bind(SocketAddr::from(([127, 0, 0, 1], 3401))).await {
             Ok(s) => s,
             Err(error) => panic!("couldn't bind to address{:?}", error),
         };
@@ -77,7 +75,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_sock() {
-        let mut sock = match TokioUdpServer::bind(SocketAddr::from(([127, 0, 0, 1], 3400))).await {
+        let mut sock = match TokioUdpSocket::bind(SocketAddr::from(([127, 0, 0, 1], 3400))).await {
             Ok(s) => s,
             Err(error) => panic!("couldn't bind to address{:?}", error),
         };
