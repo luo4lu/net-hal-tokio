@@ -1,4 +1,4 @@
-use addr_hal::SocketAddr;   
+use addr_hal::SocketAddr;
 use async_trait::async_trait;
 use net_hal::udp::{UdpServer, UdpSocket};
 
@@ -37,7 +37,6 @@ impl UdpSocket for TokioUdpSocket {
     }
 }
 
-
 #[async_trait]
 impl UdpServer for TokioUdpSocket {
     type SA4 = addr::SocketV4Inner;
@@ -61,12 +60,13 @@ mod tests {
 
     #[tokio::test]
     async fn test_server() {
-        let mut server = match TokioUdpSocket::bind(SocketAddr::from(([127, 0, 0, 1], 3401))).await {
+        let mut server = match TokioUdpSocket::bind(SocketAddr::from(([127, 0, 0, 1], 3401))).await
+        {
             Ok(s) => s,
             Err(error) => panic!("couldn't bind to address{:?}", error),
         };
 
-        let mut buf = [0;10];
+        let mut buf = [0; 10];
         let _buf_size = match server.recv(&mut buf).await {
             Ok(received) => println!("received {} bytes {:?}", received, &buf[..received]),
             Err(e) => panic!("recv function failed: {:?}", e),
@@ -86,9 +86,8 @@ mod tests {
         };
 
         let _buf_size = match sock.send(&[0, 1, 2]).await {
-            Ok(s) => println!("send buffer size = {}",s),
+            Ok(s) => println!("send buffer size = {}", s),
             Err(error) => panic!("couldn't send to address{:?}", error),
         };
-        //assert_eq!(buf_size,3);
     }
 }
